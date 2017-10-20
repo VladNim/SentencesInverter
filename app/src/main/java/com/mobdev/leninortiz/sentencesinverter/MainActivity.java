@@ -1,19 +1,25 @@
 package com.mobdev.leninortiz.sentencesinverter;
 
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity implements TextWatcher {
+/**
+ * Created by leninortiz on 19/10/17.
+ */
+
+public class MainActivity extends AppCompatActivity implements TextWatcher, Receiver.ReceiverListener {
     private EditText txtSentence;
     private Button btnInvert;
     private TextView txvResult;
+
+    private Receiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +31,8 @@ public class MainActivity extends AppCompatActivity implements TextWatcher {
         txvResult = (TextView) findViewById(R.id.txvResult);
 
         txtSentence.addTextChangedListener(this);
+        receiver = new Receiver(new Handler());
+        receiver.setListener(this);
     }
 
     @Override
@@ -43,6 +51,14 @@ public class MainActivity extends AppCompatActivity implements TextWatcher {
     }
 
     public void toInvert (View view) {
-        Log.d("SentencesInverter", "Invert method");
+        Inverter.startActionInvert(this, txtSentence.getText().toString(), receiver);
+    }
+
+    @Override
+    public void onReceive(int resultCode, Bundle resultData) {
+        if (resultCode == 0)
+            txvResult.setText(resultData.getString("Result"));
+        else
+            txvResult.setText("");
     }
 }
